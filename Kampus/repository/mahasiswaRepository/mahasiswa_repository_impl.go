@@ -1,4 +1,4 @@
-package mahasiswa
+package mahasiswaRepository
 
 import (
 	"context"

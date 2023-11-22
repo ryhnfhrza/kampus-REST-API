@@ -1,4 +1,4 @@
-package matakuliah
+package matakuliahRepository
 
 import (
 	"context"
@@ -34,7 +34,7 @@ func(matakuliahRepository *MatakuliahRepositoryImpl)Delete(ctx context.Context, 
 	helper.PanicIfError(err)
 }
 
-func(matakuliahRepository *MatakuliahRepositoryImpl)FindByKode(ctx context.Context, tx *sql.Tx,kodeMatakuliah int) (domain.Matakuliah, error){
+func(matakuliahRepository *MatakuliahRepositoryImpl)FindByKode(ctx context.Context, tx *sql.Tx,kodeMatakuliah string) (domain.Matakuliah, error){
 	SQL := "select kode,matakuliah,sks from matakuliah where kode = ?"
 	rows,err := tx.QueryContext(ctx,SQL,kodeMatakuliah)
 	helper.PanicIfError(err)
