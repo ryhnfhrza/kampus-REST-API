@@ -7,14 +7,20 @@ import (
 	"kampus/model/domain"
 	"kampus/model/web/mahasiswaWeb"
 	"kampus/repository/mahasiswaRepository"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type MahasiswaServiceImpl struct{
 	mahasiswaRepository mahasiswaRepository.MahasiswaRepository
 	Db *sql.DB
+	validate *validator.Validate
 }
 
 func(mahasiswaService *MahasiswaServiceImpl)Create(ctx context.Context, request mahasiswaWeb.MahasiswaCreateRequest)mahasiswaWeb.MahasiswaResponse{
+	err := mahasiswaService.validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx,err := mahasiswaService.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -33,6 +39,9 @@ func(mahasiswaService *MahasiswaServiceImpl)Create(ctx context.Context, request 
 }
 
 func(mahasiswaService *MahasiswaServiceImpl)Update(ctx context.Context,request mahasiswaWeb.MahasiswaUpdateRequest) mahasiswaWeb.MahasiswaResponse{
+	err := mahasiswaService.validate.Struct(request)
+	helper.PanicIfError(err)
+	
 	tx,err := mahasiswaService.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)

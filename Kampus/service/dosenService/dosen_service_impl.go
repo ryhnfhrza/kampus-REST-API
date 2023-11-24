@@ -7,14 +7,20 @@ import (
 	"kampus/model/domain"
 	"kampus/model/web/dosenWeb"
 	"kampus/repository/dosenRepository"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type DosenServiceImpl struct {
 	dosenRepository dosenRepository.DosenRepository
 	Db *sql.DB
+	validate *validator.Validate
 }
 
 func(dosenService *DosenServiceImpl)Create(ctx context.Context, request dosenWeb.DosenCreateRequest) dosenWeb.DosenResponse{
+	err := dosenService.validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx,err := dosenService.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -31,6 +37,9 @@ func(dosenService *DosenServiceImpl)Create(ctx context.Context, request dosenWeb
 }
 
 func(dosenService *DosenServiceImpl)Update(ctx context.Context, request dosenWeb.DosenUpdateRequest) dosenWeb.DosenResponse{
+	err := dosenService.validate.Struct(request)
+	helper.PanicIfError(err)
+
 	tx,err := dosenService.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)

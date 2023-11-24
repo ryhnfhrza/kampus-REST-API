@@ -7,14 +7,20 @@ import (
 	"kampus/model/domain"
 	"kampus/model/web/matakuliahWeb"
 	"kampus/repository/matakuliahRepository"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type matakuliahServiceImpl struct {
 	matakuliahRepository matakuliahRepository.Matakuliah
 	Db *sql.DB
+	validate *validator.Validate
 }
 
 func(matakuliahService *matakuliahServiceImpl)Create(ctx context.Context, request matakuliahWeb.MatakuliahCreateRequest) matakuliahWeb.MatakuliahResponse{
+	err := matakuliahService.validate.Struct(request)
+	helper.PanicIfError(err)
+	
 	tx,err := matakuliahService.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -31,6 +37,9 @@ func(matakuliahService *matakuliahServiceImpl)Create(ctx context.Context, reques
 }
 
 func(matakuliahService *matakuliahServiceImpl)Update(ctx context.Context, request matakuliahWeb.MatakuliahUpdateRequest) matakuliahWeb.MatakuliahResponse{
+	err := matakuliahService.validate.Struct(request)
+	helper.PanicIfError(err)
+	
 	tx,err := matakuliahService.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
