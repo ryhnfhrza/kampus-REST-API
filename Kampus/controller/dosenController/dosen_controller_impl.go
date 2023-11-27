@@ -15,6 +15,12 @@ type DosenControllerImpl struct {
 	dosenService dosenService.DosenService
 }
 
+func NewDosenController(dosenservice dosenService.DosenService)DosenController{
+	return &DosenControllerImpl{
+		dosenService: dosenservice,
+	}
+}
+
 func(dosenController *DosenControllerImpl)Create(writer http.ResponseWriter,request *http.Request,params httprouter.Params){
 	dosenCreateRequest := dosenWeb.DosenCreateRequest{}
 	helper.ReadFromRequestBody(request,&dosenCreateRequest)

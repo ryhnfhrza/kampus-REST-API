@@ -1,4 +1,4 @@
-package mahasiswacontroller
+package mahasiswaController
 
 import (
 	"net/http"

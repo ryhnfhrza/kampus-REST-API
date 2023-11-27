@@ -12,6 +12,10 @@ type MahasiswaRepositoryImpl struct{
 
 }
 
+func NewMahasiswaRepositoryImpl()MahasiswaRepository{
+	return &MahasiswaRepositoryImpl{}
+}
+
 func(mahasiswaRepository *MahasiswaRepositoryImpl)Create(ctx context.Context, tx *sql.Tx, mahasiswa domain.Mahasiswa) domain.Mahasiswa{
 	SQL := "insert into mahasiswa (nim,nama,gender,umur,semester) values (?,?,?,?,?)"
 	_,err := tx.ExecContext(ctx,SQL,mahasiswa.NIM,mahasiswa.Nama,mahasiswa.Gender,mahasiswa.Umur,mahasiswa.Semester)

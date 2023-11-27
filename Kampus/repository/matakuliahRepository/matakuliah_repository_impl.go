@@ -12,6 +12,10 @@ import (
 type MatakuliahRepositoryImpl struct{
 }
 
+func NewMatakuliahRepositoryImpl()MatakuliahRepository{
+	return &MatakuliahRepositoryImpl{}
+}
+
 func(matakuliahRepository *MatakuliahRepositoryImpl)Create(ctx context.Context, tx *sql.Tx, matakuliah domain.Matakuliah) domain.Matakuliah{
 	SQL := "insert into matakuliah (kode,matakuliah,sks) values (?,?,?)"
 	_,err := tx.ExecContext(ctx,SQL,matakuliah.Kode,matakuliah.Mata_kuliah,matakuliah.SKS)

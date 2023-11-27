@@ -12,6 +12,10 @@ type DosenRepositoryImpl struct{
 
 }
 
+func NewDosenRepositoryImpl()DosenRepository{
+	return &DosenRepositoryImpl{}
+}
+
 func(dosenRepository *DosenRepositoryImpl)Create(ctx context.Context, tx *sql.Tx, dosen domain.Dosen) domain.Dosen{
 	SQL := "insert into dosen (id,nama,gender,umur) values (?,?,?,?)"
 	_,err := tx.ExecContext(ctx,SQL,dosen.Id,dosen.Nama,dosen.Gender,dosen.Umur)

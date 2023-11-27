@@ -17,6 +17,14 @@ type MahasiswaServiceImpl struct{
 	validate *validator.Validate
 }
 
+func NewMahasiswaService(MahasiswaRepository mahasiswaRepository.MahasiswaRepository,db *sql.DB,Validate *validator.Validate)MahasiswaService{
+	return &MahasiswaServiceImpl{
+		mahasiswaRepository: MahasiswaRepository,
+		Db: db,
+		validate: Validate,
+	}
+}
+
 func(mahasiswaService *MahasiswaServiceImpl)Create(ctx context.Context, request mahasiswaWeb.MahasiswaCreateRequest)mahasiswaWeb.MahasiswaResponse{
 	err := mahasiswaService.validate.Struct(request)
 	helper.PanicIfError(err)

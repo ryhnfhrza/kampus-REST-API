@@ -12,9 +12,17 @@ import (
 )
 
 type matakuliahServiceImpl struct {
-	matakuliahRepository matakuliahRepository.Matakuliah
+	matakuliahRepository matakuliahRepository.MatakuliahRepository
 	Db *sql.DB
 	validate *validator.Validate
+}
+
+func NewMatakuliahService(MatakuliahRepository matakuliahRepository.MatakuliahRepository,db *sql.DB,Validate *validator.Validate)MatakuliahService{
+	return &matakuliahServiceImpl{
+		matakuliahRepository: MatakuliahRepository,
+		Db: db,
+		validate: Validate,
+	}
 }
 
 func(matakuliahService *matakuliahServiceImpl)Create(ctx context.Context, request matakuliahWeb.MatakuliahCreateRequest) matakuliahWeb.MatakuliahResponse{

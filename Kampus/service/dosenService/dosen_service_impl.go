@@ -17,6 +17,14 @@ type DosenServiceImpl struct {
 	validate *validator.Validate
 }
 
+func NewDosenService(DosenRepository dosenRepository.DosenRepository,db *sql.DB,Validate *validator.Validate)DosenService{
+	return &DosenServiceImpl{
+		dosenRepository: DosenRepository,
+		Db: db,
+		validate: Validate,
+	}
+}
+
 func(dosenService *DosenServiceImpl)Create(ctx context.Context, request dosenWeb.DosenCreateRequest) dosenWeb.DosenResponse{
 	err := dosenService.validate.Struct(request)
 	helper.PanicIfError(err)

@@ -14,6 +14,12 @@ type MatakuliahControllerImpl struct {
 	matakuliahService matakuliahService.MatakuliahService
 }
 
+func NewMatakuliahController(Matakuliahservice matakuliahService.MatakuliahService)MatakuliahController{
+	return &MatakuliahControllerImpl{
+		matakuliahService: Matakuliahservice,
+	}
+}
+
 func(matakuliahController *MatakuliahControllerImpl)Create(writer http.ResponseWriter,request *http.Request,params httprouter.Params){
 	matakuliahCreateRequest := matakuliahWeb.MatakuliahCreateRequest{}
 	helper.ReadFromRequestBody(request,&matakuliahCreateRequest)

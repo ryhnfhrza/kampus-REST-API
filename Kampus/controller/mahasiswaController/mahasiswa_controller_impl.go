@@ -1,4 +1,4 @@
-package mahasiswacontroller
+package mahasiswaController
 
 import (
 	"kampus/helper"
@@ -12,6 +12,12 @@ import (
 
 type MahasiswaControllerImpl struct{
 	mahasiswaService mahasiswaService.MahasiswaService
+}
+
+func NewMahasiswaController(Mahasiswaservice mahasiswaService.MahasiswaService)MahasiswaController{
+	return &MahasiswaControllerImpl{
+		mahasiswaService: Mahasiswaservice,
+	}
 }
 
 func(mahasiswaController *MahasiswaControllerImpl)Create(writer http.ResponseWriter,request *http.Request,params httprouter.Params){

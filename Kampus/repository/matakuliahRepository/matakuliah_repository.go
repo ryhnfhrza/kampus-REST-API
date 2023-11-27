@@ -6,7 +6,7 @@ import (
 	"kampus/model/domain"
 )
 
-type Matakuliah interface{
+type MatakuliahRepository interface{
 Create(ctx context.Context, tx *sql.Tx, matakuliah domain.Matakuliah) domain.Matakuliah
 Update(ctx context.Context, tx *sql.Tx, matakuliah domain.Matakuliah) domain.Matakuliah
 Delete(ctx context.Context, tx *sql.Tx, matakuliah domain.Matakuliah)
