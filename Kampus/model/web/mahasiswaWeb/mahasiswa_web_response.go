@@ -1,9 +1,9 @@
 package mahasiswaWeb
 
 type MahasiswaResponse struct {
-	NIM      string
-	Nama     string
-	Gender   string
-	Umur     int
-	Semester int
+	NIM      string `json:"nim"`
+	Nama     string `json:"nama"`
+	Gender   string `json:"gender"`
+	Umur     int    `json:"umur"`
+	Semester int    `json:"semester"`
 }

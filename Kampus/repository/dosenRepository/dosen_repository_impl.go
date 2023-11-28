@@ -18,8 +18,13 @@ func NewDosenRepositoryImpl()DosenRepository{
 
 func(dosenRepository *DosenRepositoryImpl)Create(ctx context.Context, tx *sql.Tx, dosen domain.Dosen) domain.Dosen{
 	SQL := "insert into dosen (id,nama,gender,umur) values (?,?,?,?)"
-	_,err := tx.ExecContext(ctx,SQL,dosen.Id,dosen.Nama,dosen.Gender,dosen.Umur)
+	result,err := tx.ExecContext(ctx,SQL,dosen.Id,dosen.Nama,dosen.Gender,dosen.Umur)
 	helper.PanicIfError(err)
+
+	id,err := result.LastInsertId()
+	helper.PanicIfError(err)
+
+	dosen.Id = int(id)
 
 	return dosen
 }

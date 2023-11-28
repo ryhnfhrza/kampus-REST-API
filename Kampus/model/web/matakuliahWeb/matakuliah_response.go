@@ -1,7 +1,7 @@
 package matakuliahWeb
 
 type MatakuliahResponse struct {
-	Kode       string
-	Matakuliah string
-	SKS        int
+	Kode       string `json:"kode"`
+	Matakuliah string `json:"matakuliah"`
+	SKS        int    `json:"sks"`
 }
