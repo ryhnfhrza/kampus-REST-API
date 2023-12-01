@@ -3,6 +3,7 @@ package mahasiswaService
 import (
 	"context"
 	"database/sql"
+	"kampus/exception"
 	"kampus/helper"
 	"kampus/model/domain"
 	"kampus/model/web/mahasiswaWeb"
@@ -55,7 +56,9 @@ func(mahasiswaService *MahasiswaServiceImpl)Update(ctx context.Context,request m
 	defer helper.CommitOrRollback(tx)
 
 	mahasiswa,err := mahasiswaService.mahasiswaRepository.FindByNim(ctx,tx,request.NIM)
-	helper.PanicIfError(err)
+	if err != nil{
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	mahasiswa.Nama = request.Nama
 	mahasiswa.Semester	= request.Semester
@@ -72,7 +75,9 @@ func(mahasiswaService *MahasiswaServiceImpl)Delete(ctx context.Context, mahasisw
 	defer helper.CommitOrRollback(tx)
 
 	mahasiswa,err := mahasiswaService.mahasiswaRepository.FindByNim(ctx,tx,mahasiswaNIM)
-	helper.PanicIfError(err)
+	if err != nil{
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	mahasiswaService.mahasiswaRepository.Delete(ctx,tx,mahasiswa)
 }
@@ -83,7 +88,9 @@ func(mahasiswaService *MahasiswaServiceImpl)FindByNIM(ctx context.Context,mahasi
 	defer helper.CommitOrRollback(tx)
 
 	mahasiswa,err := mahasiswaService.mahasiswaRepository.FindByNim(ctx,tx,mahasiswaNIM)
-	helper.PanicIfError(err)
+	if err != nil{
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToMahasiswaResponse(mahasiswa)
 }

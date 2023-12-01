@@ -5,6 +5,7 @@ import (
 	"kampus/controller/dosenController"
 	"kampus/controller/mahasiswaController"
 	"kampus/controller/matakuliahController"
+	"kampus/exception"
 	"kampus/helper"
 	"kampus/repository/dosenRepository"
 	"kampus/repository/mahasiswaRepository"
@@ -60,7 +61,9 @@ func main() {
 	router.POST("/api/matakuliah",matakuliahController.Create)
 	router.PUT("/api/matakuliah/:matakuliahKode",matakuliahController.Update)
 	router.DELETE("/api/matakuliah/:matakuliahKode",matakuliahController.Delete)
-	
+
+	router.PanicHandler = exception.ErrorHandler
+
 	server := http.Server{
 		Addr: "localhost:3000",
 		Handler: router,

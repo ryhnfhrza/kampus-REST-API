@@ -3,6 +3,7 @@ package matakuliahService
 import (
 	"context"
 	"database/sql"
+	"kampus/exception"
 	"kampus/helper"
 	"kampus/model/domain"
 	"kampus/model/web/matakuliahWeb"
@@ -53,7 +54,9 @@ func(matakuliahService *matakuliahServiceImpl)Update(ctx context.Context, reques
 	defer helper.CommitOrRollback(tx)
 
 	matakuliah,err := matakuliahService.matakuliahRepository.FindByKode(ctx,tx,request.Kode)
-	helper.PanicIfError(err)
+	if err != nil{
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	matakuliah.Mata_kuliah = request.Matakuliah
 	matakuliah.SKS = request.SKS
@@ -69,7 +72,9 @@ func(matakuliahService *matakuliahServiceImpl)Delete(ctx context.Context, mataku
 	defer helper.CommitOrRollback(tx)
 
 	matakuliah,err := matakuliahService.matakuliahRepository.FindByKode(ctx,tx,matakuliahKode)
-	helper.PanicIfError(err)
+	if err != nil{
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	matakuliahService.matakuliahRepository.Delete(ctx,tx,matakuliah)
 }
@@ -80,7 +85,9 @@ func(matakuliahService *matakuliahServiceImpl)FindByKode(ctx context.Context, ma
 	defer helper.CommitOrRollback(tx)
 
 	matakuliah,err := matakuliahService.matakuliahRepository.FindByKode(ctx,tx,matakuliahKode)
-	helper.PanicIfError(err)
+	if err != nil{
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToMatakuliahResponse(matakuliah)
 }

@@ -56,7 +56,7 @@ func(dosenRepository *DosenRepositoryImpl)FindById(ctx context.Context, tx *sql.
 		helper.PanicIfError(err)
 		return dosen,nil
 	}else{
-		return dosen,errors.New("NIM tidak ditemukan")
+		return dosen,errors.New("Id dosen tidak ditemukan")
 	}
 }
 

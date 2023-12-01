@@ -51,7 +51,7 @@ func(matakuliahRepository *MatakuliahRepositoryImpl)FindByKode(ctx context.Conte
 		helper.PanicIfError(err)
 		return matakuliah,nil
 	}else{
-		return matakuliah,errors.New("NIM tidak ditemukan")
+		return matakuliah,errors.New("Kode matakuliah tidak ditemukan")
 	}
 }
 

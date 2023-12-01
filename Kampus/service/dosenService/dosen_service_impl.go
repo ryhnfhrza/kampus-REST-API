@@ -3,6 +3,7 @@ package dosenService
 import (
 	"context"
 	"database/sql"
+	"kampus/exception"
 	"kampus/helper"
 	"kampus/model/domain"
 	"kampus/model/web/dosenWeb"
@@ -53,7 +54,9 @@ func(dosenService *DosenServiceImpl)Update(ctx context.Context, request dosenWeb
 	defer helper.CommitOrRollback(tx)
 
 	dosen,err := dosenService.dosenRepository.FindById(ctx,tx,request.Id)
-	helper.PanicIfError(err)
+	if err != nil{
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	dosen.Nama = request.Nama
 	dosen.Umur = request.Umur
@@ -69,7 +72,9 @@ func(dosenService *DosenServiceImpl)Delete(ctx context.Context, dosenId int){
 	defer helper.CommitOrRollback(tx)
 
 	dosen,err := dosenService.dosenRepository.FindById(ctx,tx,dosenId)
-	helper.PanicIfError(err)
+	if err != nil{
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 	
 	dosenService.dosenRepository.Delete(ctx,tx,dosen)
 }
@@ -80,7 +85,9 @@ func(dosenService *DosenServiceImpl)FindById(ctx context.Context, dosenId int) d
 	defer helper.CommitOrRollback(tx)
 
 	dosen,err := dosenService.dosenRepository.FindById(ctx,tx,dosenId)
-	helper.PanicIfError(err)
+	if err != nil{
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToDosenResponse(dosen)
 }
