@@ -3,6 +3,7 @@ package helper
 import (
 	"kampus/model/domain"
 	"kampus/model/web/dosenWeb"
+	"kampus/model/web/jurusanWeb"
 	"kampus/model/web/mahasiswaWeb"
 	"kampus/model/web/matakuliahWeb"
 )
@@ -12,8 +13,10 @@ func ToMahasiswaResponse(mahasiswa domain.Mahasiswa)mahasiswaWeb.MahasiswaRespon
 		NIM: mahasiswa.NIM,
 		Nama: mahasiswa.Nama,
 		Gender: mahasiswa.Gender,
-		Umur: mahasiswa.Umur,
+		TanggalLahir: mahasiswa.TanggalLahir,
 		Semester: mahasiswa.Semester,
+		KodeJurusan: mahasiswa.KodeJurusan,
+		Angkatan: mahasiswa.Angkatan,
 	}
 }
 
@@ -30,7 +33,7 @@ func ToDosenResponse(dosen domain.Dosen)dosenWeb.DosenResponse{
 		Id: dosen.Id,
 		Nama: dosen.Nama,
 		Gender: dosen.Gender,
-		Umur: dosen.Umur,
+		TanggalLahir: dosen.TanggalLahir,
 	}
 
 }
@@ -58,4 +61,20 @@ func ToMatakuliahResponses(matakuliah []domain.Matakuliah)[]matakuliahWeb.Mataku
 		matakuliahResponses = append(matakuliahResponses, ToMatakuliahResponse(mk))
 	}
 	return matakuliahResponses
+}
+
+func ToJurusanResponse(jurusan domain.Jurusan)jurusanWeb.JurusanWebResponse{
+	return jurusanWeb.JurusanWebResponse{
+		KodeJurusan: jurusan.Kode,
+		NamaJurusan: jurusan.NamaJurusan,
+	}
+
+}
+
+func ToJurusanResponses(jurusan []domain.Jurusan)[]jurusanWeb.JurusanWebResponse{
+	var jurusanResponses []jurusanWeb.JurusanWebResponse
+	for _,jsn := range jurusan{
+		jurusanResponses = append(jurusanResponses, ToJurusanResponse(jsn))
+	}
+	return jurusanResponses
 }

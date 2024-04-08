@@ -6,7 +6,7 @@ import (
 )
 
 func NewDb() *sql.DB{
-	db,err := sql.Open("mysql","root:Rayhan22@tcp(localhost:3306)/kampus")
+	db,err := sql.Open("mysql","root:Rayhan22@tcp(localhost:3306)/kampus?parseTime=true")
 	if err != nil{
 		panic(err)
 	}

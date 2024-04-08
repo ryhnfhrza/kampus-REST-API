@@ -1,16 +1,19 @@
 package main
 
 import (
-	app "kampus/App"
+	"kampus/app"
 	"kampus/controller/dosenController"
+	"kampus/controller/jurusanController"
 	"kampus/controller/mahasiswaController"
 	"kampus/controller/matakuliahController"
 	"kampus/exception"
 	"kampus/helper"
 	"kampus/repository/dosenRepository"
+	"kampus/repository/jurusanRepository"
 	"kampus/repository/mahasiswaRepository"
 	"kampus/repository/matakuliahRepository"
 	"kampus/service/dosenService"
+	"kampus/service/jurusanService"
 	"kampus/service/mahasiswaService"
 	"kampus/service/matakuliahService"
 	"net/http"
@@ -23,6 +26,11 @@ import (
 func main() {
 	validate := validator.New()
 	db := app.NewDb()
+
+	//Jurusan
+	jurusanRepository := jurusanRepository.NewJurusanRepositoryImpl()
+	jurusanService := jurusanService.NewJurusanService(jurusanRepository,db,validate)
+	jurusanController := jurusanController.NewJurusanController(jurusanService)
 
 	//Mahasiswa
 	mahasiswaRepository := mahasiswaRepository.NewMahasiswaRepositoryImpl()
@@ -40,6 +48,13 @@ func main() {
 	matakuliahController := matakuliahController.NewMatakuliahController(matakuliahService)
 
 	router := httprouter.New()
+
+	//Jurusan
+	router.GET("/api/jurusan",jurusanController.FindAllJurusan)
+	router.GET("/api/jurusan/:jurusanKode",jurusanController.FindJurusanByKode)
+	router.POST("/api/jurusan",jurusanController.AddJurusan)
+	router.PUT("/api/jurusan/:jurusanKode",jurusanController.UpdateNamaJurusan)
+	router.DELETE("/api/jurusan/:jurusanKode",jurusanController.DeleteJurusan)
 
 	//Mahasiswa 
 	router.GET("/api/mahasiswa",mahasiswaController.FindAll)
@@ -72,5 +87,3 @@ func main() {
 	err := server.ListenAndServe()
 	helper.PanicIfError(err)
 }
-
-//rapikan kode mahasiswa service

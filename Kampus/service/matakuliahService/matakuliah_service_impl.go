@@ -8,6 +8,7 @@ import (
 	"kampus/model/domain"
 	"kampus/model/web/matakuliahWeb"
 	"kampus/repository/matakuliahRepository"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -34,8 +35,10 @@ func(matakuliahService *matakuliahServiceImpl)Create(ctx context.Context, reques
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	matkulKode := strings.ToUpper(request.Kode)
+
 	matakuliah := domain.Matakuliah{
-		Kode: request.Kode,
+		Kode: matkulKode,
 		Mata_kuliah: request.Matakuliah,
 		SKS: request.SKS,
 	}

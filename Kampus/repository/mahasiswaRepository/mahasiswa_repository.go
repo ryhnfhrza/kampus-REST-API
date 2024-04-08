@@ -12,4 +12,5 @@ type MahasiswaRepository interface {
 	Delete(ctx context.Context, tx *sql.Tx, mahasiswa domain.Mahasiswa)
 	FindByNim(ctx context.Context, tx *sql.Tx,mahasiswaNIM string)  (domain.Mahasiswa, error)
 	FindAll(ctx context.Context, tx *sql.Tx) []domain.Mahasiswa
+	NIMTerakhirMahasiswaPadaJurusan(ctx context.Context,tx *sql.Tx,kodeJurusan int,angkatan int)string
 }

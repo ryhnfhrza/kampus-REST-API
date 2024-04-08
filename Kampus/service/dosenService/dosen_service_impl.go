@@ -8,6 +8,7 @@ import (
 	"kampus/model/domain"
 	"kampus/model/web/dosenWeb"
 	"kampus/repository/dosenRepository"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -26,65 +27,71 @@ func NewDosenService(DosenRepository dosenRepository.DosenRepository,db *sql.DB,
 	}
 }
 
-func(dosenService *DosenServiceImpl)Create(ctx context.Context, request dosenWeb.DosenCreateRequest) dosenWeb.DosenResponse{
-	err := dosenService.validate.Struct(request)
+func(Service *DosenServiceImpl)Create(ctx context.Context, request dosenWeb.DosenCreateRequest) dosenWeb.DosenResponse{
+	err := Service.validate.Struct(request)
 	helper.PanicIfError(err)
 
-	tx,err := dosenService.Db.Begin()
+	tx,err := Service.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
+
+	formatter := "2006-01-02"
+	birthDate := request.TanggalLahir
+	parseTime , err := time.Parse(formatter,birthDate)
+	helper.PanicIfError(err)
 
 	dosen := domain.Dosen{
 		Nama: request.Nama,
 		Gender: request.Gender,
-		Umur: request.Umur,
+		TanggalLahir: parseTime,
 	}
 
-	dosen = dosenService.dosenRepository.Create(ctx,tx,dosen)
+	dosen = Service.dosenRepository.Create(ctx,tx,dosen)
 
 	return helper.ToDosenResponse(dosen)
 }
 
-func(dosenService *DosenServiceImpl)Update(ctx context.Context, request dosenWeb.DosenUpdateRequest) dosenWeb.DosenResponse{
-	err := dosenService.validate.Struct(request)
+func(Service *DosenServiceImpl)Update(ctx context.Context, request dosenWeb.DosenUpdateRequest) dosenWeb.DosenResponse{
+	err := Service.validate.Struct(request)
 	helper.PanicIfError(err)
 
-	tx,err := dosenService.Db.Begin()
+	tx,err := Service.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	dosen,err := dosenService.dosenRepository.FindById(ctx,tx,request.Id)
+	dosen,err := Service.dosenRepository.FindById(ctx,tx,request.Id)
 	if err != nil{
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
+	request.Nama = helper.GetDefaultIfEmpty(request.Nama,dosen.Nama)
+	
 	dosen.Nama = request.Nama
-	dosen.Umur = request.Umur
 	
-	dosen = dosenService.dosenRepository.Update(ctx,tx,dosen)
+	dosen = Service.dosenRepository.Update(ctx,tx,dosen)
 
 	return helper.ToDosenResponse(dosen)
 }
 
-func(dosenService *DosenServiceImpl)Delete(ctx context.Context, dosenId int){
-	tx,err := dosenService.Db.Begin()
+func(Service *DosenServiceImpl)Delete(ctx context.Context, dosenId int){
+	tx,err := Service.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	dosen,err := dosenService.dosenRepository.FindById(ctx,tx,dosenId)
+	dosen,err := Service.dosenRepository.FindById(ctx,tx,dosenId)
 	if err != nil{
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 	
-	dosenService.dosenRepository.Delete(ctx,tx,dosen)
+	Service.dosenRepository.Delete(ctx,tx,dosen)
 }
 
-func(dosenService *DosenServiceImpl)FindById(ctx context.Context, dosenId int) dosenWeb.DosenResponse{
-	tx,err := dosenService.Db.Begin()
+func(Service *DosenServiceImpl)FindById(ctx context.Context, dosenId int) dosenWeb.DosenResponse{
+	tx,err := Service.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	dosen,err := dosenService.dosenRepository.FindById(ctx,tx,dosenId)
+	dosen,err := Service.dosenRepository.FindById(ctx,tx,dosenId)
 	if err != nil{
 		panic(exception.NewNotFoundError(err.Error()))
 	}
@@ -92,13 +99,12 @@ func(dosenService *DosenServiceImpl)FindById(ctx context.Context, dosenId int) d
 	return helper.ToDosenResponse(dosen)
 }
 
-func(dosenService *DosenServiceImpl)FindAll(ctx context.Context) []dosenWeb.DosenResponse{
-	tx,err := dosenService.Db.Begin()
+func(Service *DosenServiceImpl)FindAll(ctx context.Context) []dosenWeb.DosenResponse{
+	tx,err := Service.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	dosen := dosenService.dosenRepository.FindAll(ctx,tx)
-	helper.PanicIfError(err)
+	dosen := Service.dosenRepository.FindAll(ctx,tx)
 
 	return helper.ToDosenResponses(dosen)
 }
