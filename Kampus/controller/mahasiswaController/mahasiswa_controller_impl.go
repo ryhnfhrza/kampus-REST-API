@@ -86,3 +86,15 @@ func(mahasiswaController *MahasiswaControllerImpl)FindAll(writer http.ResponseWr
 
 	helper.WriteToResponseBody(writer,webResponse)
 }
+
+func(mahasiswaController *MahasiswaControllerImpl)FindMatkulDosen(writer http.ResponseWriter,request *http.Request,params httprouter.Params){
+	mahasiswaNIM := params.ByName("mahasiswaNIM")
+	mahasiswaResponses := mahasiswaController.mahasiswaService.FindMahasiswaMatkulDosen(request.Context(),mahasiswaNIM)
+	webResponse := web.WebResponse{
+		Code: http.StatusOK,
+		Status: "OK",
+		Data: mahasiswaResponses,
+	}
+
+	helper.WriteToResponseBody(writer,webResponse)
+}

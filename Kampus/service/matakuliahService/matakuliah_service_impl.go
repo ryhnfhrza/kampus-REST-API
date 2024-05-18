@@ -61,8 +61,17 @@ func(matakuliahService *matakuliahServiceImpl)Update(ctx context.Context, reques
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-	matakuliah.Mata_kuliah = request.Matakuliah
-	matakuliah.SKS = request.SKS
+	if request.Matakuliah == ""{
+		request.Matakuliah = matakuliah.Mata_kuliah
+	}else{
+		matakuliah.Mata_kuliah = request.Matakuliah
+	}
+
+	if request.SKS == 0 {
+		request.SKS = matakuliah.SKS
+	}else{
+		matakuliah.SKS = request.SKS
+	}
 
 	matakuliah = matakuliahService.matakuliahRepository.Update(ctx,tx,matakuliah)
 

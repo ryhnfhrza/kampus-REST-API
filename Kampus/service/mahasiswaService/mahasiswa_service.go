@@ -11,4 +11,5 @@ type MahasiswaService interface {
 	Delete(ctx context.Context, mahasiswaNIM string)
 	FindByNIM(ctx context.Context,mahasiswaNIM string)mahasiswaWeb.MahasiswaResponse
 	FindAll(ctx context.Context)[]mahasiswaWeb.MahasiswaResponse
+	FindMahasiswaMatkulDosen(ctx context.Context,mahasiswaNIM string)mahasiswaWeb.MahasiswaMatkulDosenResponse
 }

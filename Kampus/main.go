@@ -3,17 +3,23 @@ package main
 import (
 	"kampus/app"
 	"kampus/controller/dosenController"
+	controllerDosenMatkul "kampus/controller/dosenMatkulController"
 	"kampus/controller/jurusanController"
 	"kampus/controller/mahasiswaController"
+	controllerMahasiswaMatkul "kampus/controller/mahasiswaMatkulController"
 	"kampus/controller/matakuliahController"
 	"kampus/exception"
 	"kampus/helper"
 	"kampus/repository/dosenRepository"
+	repositoryDosenMatkul "kampus/repository/dosen_kelas_matkulRepository"
 	"kampus/repository/jurusanRepository"
 	"kampus/repository/mahasiswaRepository"
+	repositoryMahasiswaMatkul "kampus/repository/mahasiswa_matakuliahRepository"
 	"kampus/repository/matakuliahRepository"
+	ServiceDosenMatkul "kampus/service/dosenMatkulService"
 	"kampus/service/dosenService"
 	"kampus/service/jurusanService"
+	ServiceMahasiswaMatkul "kampus/service/mahasiswaMatkulService"
 	"kampus/service/mahasiswaService"
 	"kampus/service/matakuliahService"
 	"net/http"
@@ -47,6 +53,15 @@ func main() {
 	matakuliahService := matakuliahService.NewMatakuliahService(matakuliahRepository,db,validate)
 	matakuliahController := matakuliahController.NewMatakuliahController(matakuliahService)
 
+	//mahasiswaMatakuliah
+	mahasiswaMatakuliahRepository := repositoryMahasiswaMatkul.NewMahasiswaMatkulRepositoryImpl()
+	mahasiswaMatakuliahService := ServiceMahasiswaMatkul.NewMahasiswaMatkulService(mahasiswaMatakuliahRepository,db,validate,mahasiswaRepository,matakuliahRepository)
+	mahasiswaMatakuliahController := controllerMahasiswaMatkul.NewMahasiswaMatkulController(mahasiswaMatakuliahService)
+
+	//dosenKelasMatakuliah
+	dosenKelasMatakuliahRepository := repositoryDosenMatkul.NewDosenKelasMatkulRepositoryImpl()
+	dosenKelasMatakuliahService := ServiceDosenMatkul.NewDosenKelasMatkulService(dosenKelasMatakuliahRepository,db,validate,dosenRepository,matakuliahRepository)
+	dosenKelasMatakuliahController := controllerDosenMatkul.NewDosenKelasMatkulController(dosenKelasMatakuliahService)
 	router := httprouter.New()
 
 	//Jurusan
@@ -59,6 +74,7 @@ func main() {
 	//Mahasiswa 
 	router.GET("/api/mahasiswa",mahasiswaController.FindAll)
 	router.GET("/api/mahasiswa/:mahasiswaNIM",mahasiswaController.FindByNIM)
+	router.GET("/api/mahasiswaMatkulDosen/:mahasiswaNIM",mahasiswaController.FindMatkulDosen)
 	router.POST("/api/mahasiswa",mahasiswaController.Create)
 	router.PUT("/api/mahasiswa/:mahasiswaNIM",mahasiswaController.Update)
 	router.DELETE("/api/mahasiswa/:mahasiswaNIM",mahasiswaController.Delete)
@@ -77,6 +93,12 @@ func main() {
 	router.PUT("/api/matakuliah/:matakuliahKode",matakuliahController.Update)
 	router.DELETE("/api/matakuliah/:matakuliahKode",matakuliahController.Delete)
 
+	//mahasiswaMatakuliah
+	router.POST("/api/ambil-matakuliah/:mahasiswaNIM",mahasiswaMatakuliahController.AmbilMatkul)
+	
+	//dosenMatakuliah
+	router.POST("/api/ajar-matakuliah/:dosenId",dosenKelasMatakuliahController.AjarMatkul)
+	
 	router.PanicHandler = exception.ErrorHandler
 
 	server := http.Server{

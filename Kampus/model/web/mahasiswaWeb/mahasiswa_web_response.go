@@ -10,4 +10,5 @@ type MahasiswaResponse struct {
 	Semester     int    `json:"semester"`
 	KodeJurusan int `json:"kode_jurusan"`
 	Angkatan int `json:"angkatan"`
+	KodeKelas    string `json:"kode_kelas"`
 }

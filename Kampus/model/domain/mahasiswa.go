@@ -10,4 +10,5 @@ type Mahasiswa struct {
 	Semester     int
 	KodeJurusan int
 	Angkatan int
+	KodeKelas string
 }

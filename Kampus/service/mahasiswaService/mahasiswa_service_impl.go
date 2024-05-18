@@ -15,21 +15,22 @@ import (
 )
 
 type MahasiswaServiceImpl struct{
-	mahasiswaRepository mahasiswaRepository.MahasiswaRepository
+	MahasiswaRepository mahasiswaRepository.MahasiswaRepository
 	Db *sql.DB
-	validate *validator.Validate
+	Validate *validator.Validate
+	
 }
 
-func NewMahasiswaService(MahasiswaRepository mahasiswaRepository.MahasiswaRepository,db *sql.DB,Validate *validator.Validate)MahasiswaService{
+func NewMahasiswaService(mahasiswaRepository mahasiswaRepository.MahasiswaRepository,db *sql.DB,validate *validator.Validate)MahasiswaService{
 	return &MahasiswaServiceImpl{
-		mahasiswaRepository: MahasiswaRepository,
+		MahasiswaRepository: mahasiswaRepository,
 		Db: db,
-		validate: Validate,
+		Validate: validate,
 	}
 }
 
 func(Service *MahasiswaServiceImpl)Create(ctx context.Context, request mahasiswaWeb.MahasiswaCreateRequest)mahasiswaWeb.MahasiswaResponse{
-	err := Service.validate.Struct(request)
+	err := Service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
 	tx,err := Service.Db.Begin()
@@ -52,7 +53,7 @@ func(Service *MahasiswaServiceImpl)Create(ctx context.Context, request mahasiswa
 	//Create nim
 	var strNim string;
 	var jmlhMhs int
-	lastInsertNim := Service.mahasiswaRepository.NIMTerakhirMahasiswaPadaJurusan(ctx,tx,request.KodeJurusan,tahunAngkatan)
+	lastInsertNim := Service.MahasiswaRepository.NIMTerakhirMahasiswaPadaJurusan(ctx,tx,request.KodeJurusan,tahunAngkatan)
 	if lastInsertNim == ""{
 		jmlhMhs = 0
 	}else{
@@ -82,6 +83,41 @@ func(Service *MahasiswaServiceImpl)Create(ctx context.Context, request mahasiswa
 	parseTime , err := time.Parse(formatter,birthDate)
 	helper.PanicIfError(err)
 
+	// Kelas logic
+	var kodeKelas string
+	var kelasGender string
+	kelas := 1 
+	//menentukan kelas berdasarkan gender
+	if request.Gender == "pria" {
+		kelasGender = "A"
+		}else{
+		kelasGender = "B"
+	}
+	
+
+	for {
+				kodeKelas = kelasGender + strconv.Itoa(kelas)
+        adaKelas := Service.MahasiswaRepository.CheckKelas(ctx, tx, kodeKelas, request.KodeJurusan)
+        if adaKelas {
+            jmlMhsPadaKelas, err := Service.MahasiswaRepository.JumlahMhsPadaKelas(ctx, tx, kodeKelas, request.KodeJurusan)
+            if err != nil {
+                panic(exception.NewNotFoundError(err.Error()))
+            }
+            if jmlMhsPadaKelas < 30 {
+                // Kelas ditemukan dan tidak penuh, keluar dari loop
+                break
+            }
+        } else {
+            // Jika kelas tidak ada, buat kelas baru
+            Service.MahasiswaRepository.CreateKelas(ctx, tx, kodeKelas, request.KodeJurusan)
+            // Setelah membuat kelas baru, keluar dari loop
+            break
+        }
+        // Jika kelas ditemukan tetapi penuh, maka akan coba kelas selanjutnya
+        kelas++
+    }
+
+	
 
 	mahasiswa := domain.Mahasiswa{
 		NIM: nim,
@@ -91,29 +127,41 @@ func(Service *MahasiswaServiceImpl)Create(ctx context.Context, request mahasiswa
 		Semester: 1,
 		KodeJurusan: request.KodeJurusan,
 		Angkatan: tahunAngkatan,
+		KodeKelas: kodeKelas,
 	}
 
-	mahasiswa = Service.mahasiswaRepository.Create(ctx,tx,mahasiswa)
+	mahasiswa = Service.MahasiswaRepository.Create(ctx,tx,mahasiswa)
 
 	return helper.ToMahasiswaResponse(mahasiswa)
 }
 
 func(Service *MahasiswaServiceImpl)Update(ctx context.Context,request mahasiswaWeb.MahasiswaUpdateRequest) mahasiswaWeb.MahasiswaResponse{
-	err := Service.validate.Struct(request)
+	err := Service.Validate.Struct(request)
 	helper.PanicIfError(err)
 	
 	tx,err := Service.Db.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	mahasiswa,err := Service.mahasiswaRepository.FindByNim(ctx,tx,request.NIM)
+	mahasiswa,err := Service.MahasiswaRepository.FindByNim(ctx,tx,request.NIM)
 	if err != nil{
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-	mahasiswa.Semester	= request.Semester
+	if request.KodeKelas == ""{
+		request.KodeKelas = mahasiswa.KodeKelas
+	}else{
+		mahasiswa.KodeKelas = request.KodeKelas
+	}
 
-	mahasiswa = Service.mahasiswaRepository.Update(ctx,tx,mahasiswa)
+	if request.Semester == 0 {
+		request.Semester = mahasiswa.Semester
+	}else{
+		mahasiswa.Semester = request.Semester
+	}
+	
+
+	mahasiswa = Service.MahasiswaRepository.Update(ctx,tx,mahasiswa)
 
 	return helper.ToMahasiswaResponse(mahasiswa)
 }
@@ -123,12 +171,12 @@ func(Service *MahasiswaServiceImpl)Delete(ctx context.Context, mahasiswaNIM stri
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	mahasiswa,err := Service.mahasiswaRepository.FindByNim(ctx,tx,mahasiswaNIM)
+	mahasiswa,err := Service.MahasiswaRepository.FindByNim(ctx,tx,mahasiswaNIM)
 	if err != nil{
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-	Service.mahasiswaRepository.Delete(ctx,tx,mahasiswa)
+	Service.MahasiswaRepository.Delete(ctx,tx,mahasiswa)
 }
 
 func(Service *MahasiswaServiceImpl)FindByNIM(ctx context.Context,mahasiswaNIM string)mahasiswaWeb.MahasiswaResponse{
@@ -136,7 +184,7 @@ func(Service *MahasiswaServiceImpl)FindByNIM(ctx context.Context,mahasiswaNIM st
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	mahasiswa,err := Service.mahasiswaRepository.FindByNim(ctx,tx,mahasiswaNIM)
+	mahasiswa,err := Service.MahasiswaRepository.FindByNim(ctx,tx,mahasiswaNIM)
 	if err != nil{
 		panic(exception.NewNotFoundError(err.Error()))
 	}
@@ -149,7 +197,22 @@ func(Service *MahasiswaServiceImpl)FindAll(ctx context.Context)[]mahasiswaWeb.Ma
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	mahasiswa := Service.mahasiswaRepository.FindAll(ctx,tx)
+	mahasiswa := Service.MahasiswaRepository.FindAll(ctx,tx)
 
 	return helper.ToMahasiswaResponses(mahasiswa)
 }
+
+func (Service *MahasiswaServiceImpl) FindMahasiswaMatkulDosen(ctx context.Context, mahasiswaNIM string) mahasiswaWeb.MahasiswaMatkulDosenResponse {
+	tx, err := Service.Db.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	mahasiswa, err := Service.MahasiswaRepository.FindMatkuldanDosen(ctx, tx, mahasiswaNIM)
+	if err != nil {
+			panic(exception.NewNotFoundError(err.Error()))
+	}
+
+	return helper.ToMahasiswaMatkulDosenResponse(mahasiswa)
+}
+
+
