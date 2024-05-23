@@ -12,5 +12,6 @@ Welcome to the kampus API. This API allows you to interact with the campus infor
 ## Tech Stack
 
 **Golang** 
+
 **MySQL** 
 
